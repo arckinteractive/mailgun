@@ -24,7 +24,7 @@ Visit https://mailgun.com/signup to signup for a free Mailgun account if you do 
 
 The settings required for sending email are the simplest. You just need your API key and domain.
 
-![enter image description here](https://www.dropbox.com/s/vn587ehgt2xabb8/Plugin_Settings___Dev_Arck_io.png?dl=1&pv=1)
+![Plugin Settings](https://www.dropbox.com/s/vn587ehgt2xabb8/Plugin_Settings___Dev_Arck_io.png?dl=1&pv=1)
 
 A sample email template is included in views/default/mailgun/notification/body.php and should be modified for your site by overriding the view. You can view that the template will look like by clicking the View Email Template button. Additionally, clicking the Send Test Email button will send an email to the currently logged in user.
 
@@ -32,7 +32,7 @@ A sample email template is included in views/default/mailgun/notification/body.p
 
 The site email address needs to match your configured domain. In your basic site settings you would use for example notifications@em.domain.com.
 
-![enter image description here](https://www.dropbox.com/s/fd8uzd4pgexgce9/Settings___Basic_Settings___Dev_Arck_io.png?dl=1&pv=1)
+![Site Email Address](https://www.dropbox.com/s/fd8uzd4pgexgce9/Settings___Basic_Settings___Dev_Arck_io.png?dl=1&pv=1)
 
 #### Inbound ####
 
@@ -66,7 +66,7 @@ When adding actions to routes multiple actions can be chained together. Use the 
 
 Next, configure your stored messages to be retrieved. This requires enabling polling and configure a 1 minute cron.
 
-![enter image description here](https://www.dropbox.com/s/blkg908ed6knd9o/Plugin_Settings___Dev_Arck_io%202.png?dl=1&pv=1)
+![Message Polling Settings](https://www.dropbox.com/s/6fk5t1yvavv5ffe/Plugin_Settings___Dev_Arck_io_2.png?dl=1&pv=1)
 
 Notice that we need to specify a recipient here. This is a simple string match and is required because you could potentially have multiple store routes configured. When the poller runs we want it to only retrieve messages stored for this testing / developer site. That's it! Now every 60 seconds the poller will fetch any emails sent to your testing email address. 
 
