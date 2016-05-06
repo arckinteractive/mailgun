@@ -114,6 +114,8 @@ function send_new_topic_notification($topic)
 }
 ```
 
+#### Receiving Replies ####
+
 Now to handle all the deep and meaningful replies to the forum topic we can use something like this:
 
 ```php
@@ -164,8 +166,5 @@ function handle_topic_replies($message)
 	return false;
 }
 ```
-
-
-
 
 > Written with [StackEdit](https://stackedit.io/).
