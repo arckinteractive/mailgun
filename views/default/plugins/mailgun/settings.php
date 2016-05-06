@@ -100,13 +100,13 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
 
         </div>
 
-        <div style="margin-top: 30px;">
+        <div style="margin-top: 30px;padding-right: 5px;">
 
             <div class="section-head">Routes:</div>
 
             <?php if (!empty($routes)): ?>
 
-                <table id="routes">
+                <table id="routes" style="width: 99%;">
                     <thead>
                         <tr>             
                             <th>Priority</th>
