@@ -1,0 +1,15 @@
+{
+	"name": "arckinteractive/mailgun",
+	"description": "Bi-directional email handling via Mailgun",
+	"type": "elgg-plugin",
+	"keywords": ["elgg", "plugin", "notification", "email"],
+	"license": "GPL-2.0",
+	"require": {
+		"composer/installers": "^1.0.8",
+		"pelago/emogrifier": "^0.1",
+		"composer-plugin-api": "^1.0",
+		"mailgun/mailgun-php": "^1.8",
+		"fire015/flintstone": "^2.0",
+		"ramsey/uuid": "^3.4"
+	}
+}
