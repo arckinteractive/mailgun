@@ -30,10 +30,10 @@ class MGWrapper {
      * 
      * If cron is configured as suggested we will check for stored 
      * messages every 60 seconds however we will look for events that 
-     * are storedEventAge seconds old to ensure that all events have
+     * are eventAge seconds old to ensure that all events have
      * been processed.
      */
-    private $storedEventAge = 86400;
+    private $eventAge = 1800;
 
     /**
      * maxAge specifies how long (in seconds) we will store message ID's.
@@ -108,6 +108,17 @@ class MGWrapper {
     public function setRecipient($recipient)
     {
         $this->recipient = $recipient;
+    }
+
+    /**
+     * Set the age of events that we will poll for new messages.
+     *
+     * @param string $seconds
+     * @return mixed
+     */
+    public function setEventAge($seconds)
+    {
+        $this->eventAge = $seconds;
     }
 
     /**
@@ -288,7 +299,7 @@ class MGWrapper {
     {
         if (!$this->nextPage) {
          
-            $tracker = time() - $this->storedEventAge;
+            $tracker = time() - $this->eventAge;
 
             $queryString = array(
                 'event'        => 'stored',

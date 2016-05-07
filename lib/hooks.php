@@ -18,9 +18,13 @@ function mailgun_fetch_stored_messages($hook, $type, $return, $params)
         return;
     }
 
+    $recipient = elgg_get_plugin_setting('recipient', 'mailgun');
+    $age       = elgg_get_plugin_setting('event_age', 'mailgun');
+
     $mg = mailgun_client();
 
-    $mg->setRecipient(elgg_get_plugin_setting('recipient', 'mailgun'));
+    $mg->setRecipient($recipient);
+    $mg->setEventAge($age);
 
     $mg->processStoredMessages();
 }

@@ -23,10 +23,29 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
 ?>
 
 <style>
+    
+    .settings-section { border: 1px solid #ccc; margin: 20px 0; }
+
+    .settings-section > .settings-head {
+        background-color: #f5f5f5;
+        height: 36px;
+        overflow: hidden;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #ccc;
+    }
+
+    .settings-section > .settings-head h3 {
+        float: left;
+        padding: 10px;
+        color: #333;
+    }
+
+    .settings-section > .settings-body { padding: 10px; }
+
     .elgg-form-settings { max-width: 100% !important; } 
     .section-head { background-color: #c2d1d9; font-weight: bold; padding:5px; margin-bottom: 10px; font-size: 15px;}
     .clickable { cursor: pointer; } 
-    table { width: 100%; }
+    table { table-layout:fixed; width: 100%; }
     td,th { padding: 5px 5px 5px 0; }
     th { font-weight: bold; }
     #routes tbody tr { border-bottom: 1px solid #ccc; }
@@ -42,11 +61,11 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
     }
 </script>
 
-<div class="elgg-module elgg-module-widget" style="margin-top:20px;width:100%;">
+<div class="settings-section">
 
-    <div class="elgg-head"><h3>Settings</h3></div>
+    <div class="settings-head"><h3>Settings</h3></div>
 
-    <div class="elgg-body" style="padding:20px;">
+    <div class="settings-body">
 
         <input type="hidden" name="params[limit_subject]" value="no">
         <input type="hidden" name="params[embed_images]" value="base64">
@@ -73,13 +92,13 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
 </div>
 
 
-<div class="elgg-module elgg-module-widget" style="margin-top:20px;width:100%;">
+<div class="settings-section">
 
-    <div class="elgg-head">
+    <div class="settings-head">
         <h3>Inbound Routing</h3>
     </div>
 
-    <div class="elgg-body" style="padding:20px;">
+    <div class="settings-body">
 
         <p><?php echo elgg_echo("mailgun:settings:inbound:info"); ?></p>
 
@@ -106,14 +125,14 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
 
             <?php if (!empty($routes)): ?>
 
-                <table id="routes" style="width: 99%;">
+                <table id="routes">
                     <thead>
                         <tr>             
-                            <th>Priority</th>
-                            <th>Expression</th>
-                            <th>Actions</th>
-                            <th>Description</th>
-                            <th></th>
+                            <th style="width: 10%;">Priority</th>
+                            <th style="width: 30%">Expression</th>
+                            <th style="width: 30%">Actions</th>
+                            <th style="width: 20%">Description</th>
+                            <th style="width: 10%;">&nbsp;</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -125,7 +144,7 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
                                 <td><?php echo $route->expression; ?></td>
                                 <td><?php echo implode("<br/>\n", $route->actions) . '<br/>'; ?></td>
                                 <td><?php echo $route->description; ?></td>
-                                <td>
+                                <td style="text-align: right;">
                                     <?php echo elgg_view('output/url', array(
                                         'text'      => 'delete',
                                         'href'      => '/action/plugins/settings/save?plugin_id=' . $plugin->getID() . '&route_id=' . $route->id,
@@ -144,7 +163,7 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
             <?php endif; ?>
         </div>
 
-        <div style="margin-top:20px;">
+        <div style="margin-top:20px;padding-right: 5px;">
 
             <a href="javascript:void(0);" id="add-route-btn" onClick="$(this).hide(); $('#add-route').show('slow');" class="elgg-button elgg-button-action">
                 Add Route
@@ -182,7 +201,7 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
             </table>
         </div>
 
-        <div style="margin-top:40px;">
+        <div style="margin-top:40px;padding-right: 5px;">
 
             <div class="section-head">Registered Handlers:</div>
 
@@ -222,11 +241,11 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
     </div>
 </div>
 
-<div class="elgg-module elgg-module-widget" style="margin-top:20px;width:100%;">
+<div class="settings-section">
 
-    <div class="elgg-head"><h3>Stored Message Polling</h3></div>
+    <div class="settings-head"><h3>Stored Message Polling</h3></div>
 
-    <div class="elgg-body" style="padding:20px;">
+    <div class="settings-body">
 
         <p><?php echo elgg_echo("mailgun:settings:stored:info"); ?></p>
 
@@ -251,6 +270,13 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
             <div style="margin-top:3px;" class='elgg-subtext'><?php echo elgg_echo('mailgun:settings:stored:recipient:subtext'); ?></div>
         </div>
 
+        <br />
+
+        <div>
+            <label><?php echo elgg_echo("mailgun:settings:event:age"); ?>:</label>
+            <?php echo elgg_view("input/text", array("name" => "params[event_age]", "value" => $plugin->event_age ? $plugin->event_age : 1800)); ?>
+            <div style="margin-top:3px;padding-right:5px;" class='elgg-subtext'><?php echo elgg_echo('mailgun:settings:event:age:subtext'); ?></div>
+        </div>
     </div>
 
 </div>

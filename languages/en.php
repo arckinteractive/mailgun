@@ -25,16 +25,13 @@ return array(
 
 		The following event handlers have been registered for processing incoming messages:',
 
-	'mailgun:settings:stored:info' => 'If a route has been configured to store messages then use the options below to configure message retrieval.<br /><br />It is possible that multiple routes have been configured to store messages for instance if multiple sites are using the same Mailgun domain. To make sure that we only fetch messages intended for this site you should configure routing and fetching based on a unique recipient address. For example, with two sites sharing the same Mailgun domain we might use the following expressions in our routes:<br /><br />
-
-		match_recipient("^site1\+(.*)@em.domain.com")<br />
-		match_recipient("^site2\+(.*)@em.domain.com")<br /><br />
-
-		Then, in the match recipient imput below you would put your sites recipient i.e. site2.
-	',
+	'mailgun:settings:stored:info' => 'If a route has been configured to store messages then use the options below to configure message retrieval.',
 
 	'mailgun:settings:stored:recipient'         => 'Recipient Match',
-	'mailgun:settings:stored:recipient:subtext' => 'A simple match on the message recipient e.g. site2 would match on a message sent to site2+uniquetoken@em.domain.com',
+	'mailgun:settings:stored:recipient:subtext' => 'e.g. site2 would match on a message sent to site2+uniquetoken@em.domain.com and a route expression like match_recipient("^site2\+.*@em.domain.com")',
+
+	'mailgun:settings:event:age' => 'Event Age (seconds)',
+	'mailgun:settings:event:age:subtext' => 'To find new messages we make a request to the events API specifying an ascending time range that begins some time in the past (e.g. half an hour ago). If for some reason your server was down or cron was not polling you can increase this value to look for new messages further in the past. See <a href="https://documentation.mailgun.com/api-events.html#event-polling">https://documentation.mailgun.com/api-events.html#event-polling</a>',
 	
 	// notification body
 	'mailgun:notification:footer:settings' => "Configure your notification settings %shere%s",
