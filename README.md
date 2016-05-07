@@ -66,7 +66,7 @@ When adding actions to routes multiple actions can be chained together. Use the 
 
 Next, configure your stored messages to be retrieved. This requires enabling polling and configure a 1 minute cron.
 
-![Message Polling Settings](https://www.dropbox.com/s/6fk5t1yvavv5ffe/Plugin_Settings___Dev_Arck_io_2.png?dl=1&pv=1)
+![Message Polling Settings](https://www.dropbox.com/s/0sfql3t3bk5zbg6/Plugin_Settings..png?dl=1&pv=1)
 
 Notice that we need to specify a recipient here. This is a simple string match and is required because you could potentially have multiple store routes configured. When the poller runs we want it to only retrieve messages stored for this testing / developer site. That's it! Now every 60 seconds the poller will fetch any emails sent to your testing email address. 
 
@@ -150,8 +150,8 @@ function handle_topic_replies($message)
 	// Get the Elgg user from the sender
 	$user = get_user_by_email($message->getSender());
 
+	// We verify the sending user by the senders email address.
 	if (empty($user)) {
-		// Um... who the %$#@ is this person?
 		return;
 	}
 
