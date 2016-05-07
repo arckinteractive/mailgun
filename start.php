@@ -35,7 +35,7 @@ function mailgun_init() {
 	elgg_register_plugin_hook_handler('email', 'system', 'mailgun_email_handler');
 
 	// A sample event handler
-	elgg_register_event_handler('receive', 'mg_message', 'mailgun_sample_incoming_message_handler');
+	//elgg_register_event_handler('receive', 'mg_message', 'mailgun_sample_incoming_message_handler');
 
     $action_base = elgg_get_plugins_path() . 'mailgun/actions';
     elgg_register_action('mailgun/settings/save', "$action_base/settings/save.php", 'admin');

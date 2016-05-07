@@ -139,7 +139,7 @@ function mailgun_send_email(array $options = null) {
 		$message["bcc"] = is_array($options["bcc"]) ? implode(", ", $options["bcc"]) : $options["bcc"];
 	}
 
-	$attachments = null;
+	$attachments = array();
 
 	if (!empty($options["attachments"])) {
 		$attachments['attachment'] = $options["attachments"];

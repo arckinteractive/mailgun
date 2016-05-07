@@ -119,7 +119,7 @@ class MGWrapper {
      * @param mixed $attachements An array of message attachments or null
      * @return mixed
      */
-    public function sendMessage($options, $attachments=null)
+    public function sendMessage($options, $attachments=array())
     {
         $response = $this->client->sendMessage($this->domain, $options, $attachments);
 
