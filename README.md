@@ -150,8 +150,8 @@ function handle_topic_replies($message)
 	// Get the Elgg user from the sender
 	$user = get_user_by_email($message->getSender());
 
+	// We verify the sending user by the senders email address.
 	if (empty($user)) {
-		// Um... who the %$#@ is this person?
 		return;
 	}
 
