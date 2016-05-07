@@ -157,7 +157,7 @@ function handle_topic_replies($message)
 
 	$topic->annotate(
 		'topic_reply', 
-		$message->getStrippedHtml(), // Or getStrippedText() for plain text
+		$message->getStrippedText(),
 		$topic->access_id, 
 		$user[0]->guid
 	);
