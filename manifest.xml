@@ -8,7 +8,7 @@
 	<description>Provides bi-directional email handling via Mailgun (http://www.mailgun.com/)</description>
 	<website>http://www.arckinteractive.com/</website>
 	<copyright>(C) Arck Interactive, LLC 2016</copyright>
-	<license>Apache License 2.0</license>
+	<license>GNU General Public License version 2</license>
 	
 	<requires>
 		<type>elgg_release</type>
