@@ -132,7 +132,7 @@ function handle_topic_replies($message)
 		'type'    => 'object',
 		'subtype' => 'forum_topic',
 		'limit'   => 1,
-		'annotation_name_value_pairs' => array(
+		'metadata_name_value_pairs' => array(
 			'name'       => 'reply_token',
 			'value'      => $token,
 			'operator'   => '='
@@ -157,7 +157,7 @@ function handle_topic_replies($message)
 
 	$topic->annotate(
 		'topic_reply', 
-		$message->getStrippedHtml(), // Or getStrippedText() for plain text
+		$message->getStrippedText(),
 		$topic->access_id, 
 		$user[0]->guid
 	);
