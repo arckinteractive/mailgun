@@ -72,7 +72,7 @@ class Message {
      */
     public function getRecipientToken()
     {
-        if (preg_match("/^\w+\+(\S+)@.*/", $this->getTo(), $matches)) {
+        if (preg_match("/\+(\S+)@.*/", $this->getTo(), $matches)) {
             return $matches[1];
         }
     }
@@ -88,11 +88,12 @@ class Message {
     public static function addToken($email, $token=null)
     {
         if (preg_match('/\+/', $email)) {
-            return throw new Exception('The email address already includes a token.');
+            throw new Exception('The email address already includes a token.');
+            return null;
         }
 
         if (!$token) {
-            $token = preg_replace('/-/', '', Uuid::uuid1()->toString());
+            $token = preg_replace('/-/', '', \Ramsey\Uuid\Uuid::uuid1()->toString());
         }
 
         $parts = explode('@', $email);

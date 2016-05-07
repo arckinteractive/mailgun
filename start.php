@@ -15,7 +15,8 @@ elgg_register_event_handler('init', 'system', 'mailgun_init');
  *
  * @return void
  */
-function mailgun_init() {
+function mailgun_init() 
+{
 	
 	elgg_register_page_handler('mg', 'mailgun_page_handler');
 
@@ -48,7 +49,8 @@ function mailgun_init() {
  *
  * @return bool
  */
-function mailgun_page_handler($page) {
+function mailgun_page_handler($page) 
+{
 	
 	switch ($page[0]) {
 
