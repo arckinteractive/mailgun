@@ -209,7 +209,7 @@ $site_url  = elgg_get_site_url();
                     <tr>
                         <td align="center">
                             <p>Don't want these emails? Manage your 
-                                <a href="<?php echo elgg_get_entities(); ?>notifications">
+                                <a href="<?php echo elgg_get_site_url(); ?>notifications">
                                     <unsubscribe>notification settings</unsubscribe>
                                 </a>.
                             </p>
