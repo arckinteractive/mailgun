@@ -141,8 +141,14 @@ function mailgun_send_email(array $options = null) {
 
 	$attachments = array();
 
+	// Add attachments
 	if (!empty($options["attachments"])) {
 		$attachments['attachment'] = $options["attachments"];
+	}
+	
+	// Addy any inline images
+	if (!empty($options["inline"])) {
+		$attachments['inline'] = $options["inline"];
 	}
 
 	# Instantiate the Mailgun wrapper.
