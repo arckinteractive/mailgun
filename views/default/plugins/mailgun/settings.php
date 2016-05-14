@@ -10,8 +10,12 @@ $routes = array();
 
 // Retrieve configured routes from Mailgun
 if ($plugin->api_key) {
-    $mg     = mailgun_client();
-    $routes = $mg->getRoutes($offset, $limit);
+    try {
+        $mg     = mailgun_client();
+        $routes = $mg->getRoutes($offset, $limit);
+    } catch (Exception $e) {
+        register_error($e->getMessage());
+    }
 }
 
 // Get configured hook handlers
