@@ -202,7 +202,13 @@ function mailgun_client()
     $domain = elgg_get_plugin_setting('domain', 'mailgun');
     $path   = elgg_get_config("dataroot") . 'mailgun';
 
-    return new MGWrapper($apiKey, $domain, $path, false);
+    try {
+        $client = new MGWrapper($apiKey, $domain, $path, false);
+    } catch (Exception $e) {
+        register_error($e->getMessage());
+    }
+
+    return $client;
 }
 
 
