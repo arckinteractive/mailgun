@@ -85,8 +85,12 @@ class Message {
      * @param  string  $token The token to insert or if null a token will be generated.
      * @return array   
      */
-    public static function addToken($email, $token=null)
+    public static function addToken($email=null, $token=null)
     {
+        if (!$email) {
+            $email = elgg_get_site_entity()->email;
+        }
+        
         if (preg_match('/\+/', $email)) {
             throw new Exception('The email address already includes a token.');
             return null;
