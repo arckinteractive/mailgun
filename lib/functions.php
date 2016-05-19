@@ -89,24 +89,17 @@ function mailgun_send_email(array $options = null) {
 		return false;
 	}
 	
-	// TEXT part of message
-	$text = elgg_extract("text", $options);
-	
 	// normalize URL's in the message text
-	if (!empty($text)) {
-		$text = mailgun_normalize_urls($text);
+	if (!empty($options['text'])) {
+		$options['text'] = mailgun_normalize_urls($options['text']);
 	}
-	
-	// HTML part of message
-	$html = elgg_extract("html", $options);
 
-	if (!empty($html)) {
+	/* It looks like mailgun is base64 encoding the entire email which is possibly messing up base64 encoded embeds.
+	 * we should CID these instead.
+	 */
+	$options['html'] = mailgun_normalize_urls($options['html']);
 
-		// normalize URL's in the text
-		$html = mailgun_normalize_urls($html);
-
-		$html = mailgun_base64_encode_images($html);
-	}
+	$options = mailgun_inline_images($options);
 	
 	// encode subject to handle special chars
 	$subject = $options["subject"];
@@ -145,7 +138,7 @@ function mailgun_send_email(array $options = null) {
 	if (!empty($options["attachments"])) {
 		$attachments['attachment'] = $options["attachments"];
 	}
-	
+
 	// Addy any inline images
 	if (!empty($options["inline"])) {
 		$attachments['inline'] = $options["inline"];
@@ -217,15 +210,6 @@ function mailgun_css_inliner($html_text) {
 function mailgun_make_html_body($options = "", $body = "") {
 
 	global $CONFIG;
-	
-	if (!is_array($options)) {
-		elgg_deprecated_notice("mailgun_make_html_body now takes an array as param, please update your code", "1.9");
-		
-		$options = array(
-			"subject" => $options,
-			"body" => $body
-		);
-	}
 	
 	$defaults = array(
 		"subject" => "",
@@ -315,14 +299,20 @@ function mailgun_make_rfc822_address(ElggEntity $entity, $use_fallback = true) {
  * @return string
  */
 function mailgun_normalize_urls($text) {
+
 	static $pattern = '/\s(?:href|src)=([\'"]\S+[\'"])/i';
 	
 	if (empty($text)) {
 		return $text;
 	}
+
+	if (preg_match('/cid:/', $text) || preg_match('/data:/', $text)) {
+		return $text;
+	}
 	
 	// find all matches
 	$matches = array();
+
 	preg_match_all($pattern, $text, $matches);
 	
 	if (empty($matches) || !isset($matches[1])) {
@@ -334,10 +324,13 @@ function mailgun_normalize_urls($text) {
 	$urls = array_unique($urls);
 	
 	foreach ($urls as $url) {
+		
 		// remove wrapping quotes from the url
 		$real_url = substr($url, 1, -1);
+
 		// normalize url
 		$new_url = elgg_normalize_url($real_url);
+		
 		// make the correct replacement string
 		$replacement = str_replace($real_url, $new_url, $url);
 	
@@ -360,33 +353,25 @@ function mailgun_normalize_urls($text) {
  * @param string $text the text of the message to embed the images from
  * @return string
  */
-function mailgun_base64_encode_images($text) {
+function mailgun_inline_images($options) {
 
 	static $plugin_setting;
 	
-	if (empty($text)) {
-		return $text;
+	if (empty($options['html']) || !elgg_get_plugin_setting('embed_images', 'mailgun')) {
+		return $options;
 	}
 	
-	if (!isset($plugin_setting)) {
-		$plugin_setting = false;
-		
-		if (elgg_get_plugin_setting("embed_images", "mailgun", "no") === "base64") {
-			$plugin_setting = true;
-		}
-	}
-	
-	if (!$plugin_setting) {
-		return $text;
-	}
-	
-	$image_urls = mailgun_find_images($text);
+	$image_urls = mailgun_find_images($options['html']);
 
 	if (empty($image_urls)) {
-		return $text;
+		return $options;
 	}
 	
 	foreach ($image_urls as $url) {
+
+		if (preg_match('/cid:/', $url)) {
+			continue;
+		}
 
 		// remove wrapping quotes from the url
 		$image_url = substr($url, 1, -1);
@@ -394,18 +379,19 @@ function mailgun_base64_encode_images($text) {
 		// get the image contents
 		$contents = mailgun_get_image($image_url);
 
-		if (empty($contents)) {
+		if (!$contents) {
 			continue;
 		}
 		
 		// build inline image
-		$replacement = str_replace($image_url, "data:" . $contents, $url);
-		
+		$replacement = str_replace($image_url, "cid:" . $contents['name'], $url);
+
 		// replace in text
-		$text = str_replace($url, $replacement, $text);
+		$options['html']     = str_replace($url, $replacement, $options['html']);
+		$options['inline'][] = $contents['path'];
 	}
-	
-	return $text;
+
+	return $options;
 }
 
 /**
@@ -428,25 +414,28 @@ function mailgun_get_image($image_url) {
 	if (empty($image_url)) {
 		return false;
 	}
+
 	$image_url = htmlspecialchars_decode($image_url);
 	$image_url = elgg_normalize_url($image_url);
 	
 	// check cache
 	if (!isset($cache_dir)) {
+
 		$cache_dir = elgg_get_config("dataroot") . "mailgun/image_cache/";
+		
 		if (!is_dir($cache_dir)) {
 			mkdir($cache_dir, "0755", true);
 		}
 	}
 	
-	$cache_file = md5($image_url);
+	$cache_file = md5($image_url) . '.jpg';
+	
 	if (file_exists($cache_dir . $cache_file)) {
-		return file_get_contents($cache_dir . $cache_file);
+		return array('path' => $cache_dir . $cache_file, 'name' => $cache_file);
 	}
 	
 	// build cURL options
 	$ch = curl_init($image_url);
-	
 	curl_setopt($ch, CURLOPT_HEADER, false);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_TIMEOUT, 5);
@@ -480,25 +469,29 @@ function mailgun_get_image($image_url) {
 	
 	// check if local url, so we can send Elgg cookies
 	if (strpos($image_url, elgg_get_site_url()) !== false) {
+
 		if (!isset($session_cookie)) {
+			
 			$session_cookie = false;
 			
 			$cookie_settings = elgg_get_config("cookie");
+
 			if (!empty($cookie_settings)) {
-				$cookie_name = elgg_extract("name", $cookie_settings["session"]);
-				
-				$session_cookie = $cookie_name . "=" . session_id();
+				$cookie_name    = elgg_extract("name", $cookie_settings["session"]);	
+			} else {
+				$cookie_name = 'Elgg';
 			}
+
+			$session_cookie = $cookie_name . "=" . session_id();
 		}
-		
+
 		if (!empty($session_cookie)) {
 			curl_setopt($ch, CURLOPT_COOKIE, $session_cookie);
 		}
 	}
 	
 	// get the image
-	$contents = curl_exec($ch);
-	$content_type = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+	$contents  = curl_exec($ch);
 	$http_code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
 	
 	curl_close($ch);
@@ -507,15 +500,11 @@ function mailgun_get_image($image_url) {
 		return false;
 	}
 	
-	// build a valid uri
-	// https://en.wikipedia.org/wiki/Data_URI_scheme
-	$base64_result = $content_type . ";charset=UTF-8;base64," . base64_encode($contents);
-	
 	// write to cache
-	file_put_contents($cache_dir . $cache_file, $base64_result);
+	file_put_contents($cache_dir . $cache_file, $contents);
 	
 	// return result
-	return $base64_result;
+	return array('path' => $cache_dir . $cache_file, 'name' => $cache_file);
 }
 
 /**

@@ -8,6 +8,7 @@ return array(
 	// settings
 	'mailgun:settings:apikey'          => 'API Key',
 	'mailgun:settings:domain'          => 'Domain',
+	'mailgun:settings:embed'           => 'Embed Images',
 	'mailgun:settings:inbound'         => 'Inbound Routing',
 	'mailgun:settings:polling'         => 'Poll for stored messages',
 	'mailgun:settings:polling:subtext' => 'This option should only be enabled if you are using a store action in your inbound routing and requires that cron be configured.',

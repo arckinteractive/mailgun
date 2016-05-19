@@ -84,6 +84,15 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
             <?php echo elgg_view("input/text", array("name" => "params[domain]", "value" => $plugin->domain)); ?>
         </p>
 
+        <p>
+            <label><?php echo elgg_echo("mailgun:settings:embed"); ?>:</label>
+            <?php echo elgg_view("input/select", array(
+                'name'           => "params[embed_images]", 
+                'options_values' => array(0 => 'No', 1 => 'Yes'), 
+                'value'          => $plugin->embed_images)); 
+            ?>
+        </p>
+
         <a href="<?php echo elgg_get_site_url(); ?>mg/test?view=1" target="_blank" class="elgg-button elgg-button-action">
             View Email Template
         </a>
