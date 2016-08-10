@@ -1,6 +1,6 @@
-
 Mailgun Client for Elgg
 --------------------------
+![Elgg 2.0](https://img.shields.io/badge/Elgg-2.0.x-orange.svg?style=flat-square)
 
 *Mailgun* is a transactional Email API Service for developers by Rackspace. It offers a complete cloud-based email service for sending, receiving and tracking email sent through your websites and applications. 
 
