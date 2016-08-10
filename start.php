@@ -94,7 +94,11 @@ function mailgun_test_page_handler()
 
 	if (!empty($message)) {
 		$message = mailgun_normalize_urls($message);
-		$message = mailgun_base64_encode_images($message);
+		$inline_opts = [
+			'html' => $message,
+		];
+		$inline_opts = mailgun_inline_images($inline_opts);
+		$message = $inline_opts['html'];
 	}
 
 	if (get_input('view')) {

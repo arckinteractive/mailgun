@@ -53,7 +53,7 @@ return array(
 		Site name: %s
 		Site URL: %s
 
-		This elgg logo is an embedded as an inline image:
+		This elgg logo is embedded as an inline image:
 
 		<img src="https://elgg.org/images/elgg_small.png">
 
