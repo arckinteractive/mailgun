@@ -72,7 +72,7 @@ class MGWrapper {
         $this->storage = $path;
 
         try {
-			$httpClient = new \Http\Adapter\Guzzle6\Client();
+            $httpClient = new \Http\Adapter\Guzzle6\Client();
             $this->client = new Mailgun($this->apiKey, $httpClient);
         } catch (Exception $e) {
             throw new Exception("Failed to initialize Mailgun client");

@@ -34,6 +34,10 @@ function mailgun_init() {
 	// Handler that takes care of sending emails as HTML
 	elgg_register_plugin_hook_handler('email', 'system', 'mailgun_email_handler');
 
+	// Automatically add tokens to notifications with an event object
+	elgg_unregister_plugin_hook_handler('send', 'notification:email', '_elgg_send_email_notification');
+	elgg_register_plugin_hook_handler('send', 'notification:email', 'mailgun_send_email_notification');
+
 	// A sample event handler
 	//elgg_register_event_handler('receive', 'mg_message', 'mailgun_sample_incoming_message_handler');
 
