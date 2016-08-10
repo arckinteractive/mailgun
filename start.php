@@ -15,14 +15,13 @@ elgg_register_event_handler('init', 'system', 'mailgun_init');
  *
  * @return void
  */
-function mailgun_init() 
-{
-	
+function mailgun_init() {
+
 	elgg_register_page_handler('mg', 'mailgun_page_handler');
 
-    // Register the incoming message webhook as a public page
-    elgg_register_plugin_hook_handler('public_pages', 'walled_garden', 'mailgun_public_pages');
-	
+	// Register the incoming message webhook as a public page
+	elgg_register_plugin_hook_handler('public_pages', 'walled_garden', 'mailgun_public_pages');
+
 	// Check for stored inbound emails
 	elgg_register_plugin_hook_handler('cron', 'minute', 'mailgun_fetch_stored_messages');
 
@@ -38,8 +37,8 @@ function mailgun_init()
 	// A sample event handler
 	//elgg_register_event_handler('receive', 'mg_message', 'mailgun_sample_incoming_message_handler');
 
-    $action_base = elgg_get_plugins_path() . 'mailgun/actions';
-    elgg_register_action('mailgun/settings/save', "$action_base/settings/save.php", 'admin');
+	$action_base = elgg_get_plugins_path() . 'mailgun/actions';
+	elgg_register_action('mailgun/settings/save', "$action_base/settings/save.php", 'admin');
 }
 
 /**
@@ -49,87 +48,24 @@ function mailgun_init()
  *
  * @return bool
  */
-function mailgun_page_handler($page) 
-{
-	
+function mailgun_page_handler($page) {
+
 	switch ($page[0]) {
 
 		case 'test':
-			mailgun_test_page_handler();
+			echo elgg_view_resource('mailgun/test');
 			break;
 
 		case 'messages':
-            mailgun_client()->processIncomingMessage($_POST);
+			mailgun_client()->processIncomingMessage($_POST);
 			break;
 
 		case 'webhooks':
 			mailgun_webhooks_page_handler();
 			break;
 	}
-	
+
 	return true;
-}
-
-function mailgun_test_page_handler()
-{
-	elgg_admin_gatekeeper();
-
-	$user = elgg_get_logged_in_user_entity();
-	$site = elgg_get_site_entity();
-
-	$subject = elgg_echo('mailgun:test:subject');
-
-	$message = elgg_view('mailgun/notification/body', [
-		'subject'   => $subject,
-		'body'      => elgg_echo('mailgun:test:body', [
-			$user->name,
-			elgg_get_plugins_path() . 'mailgun/views/default/mailgun/notification/body.php',
-			$site->name,
-			$site->url
-		]),
-		'recipient' => $user
-	]);
-
-	$message = mailgun_css_inliner($message);
-
-	if (!empty($message)) {
-		$message = mailgun_normalize_urls($message);
-		$inline_opts = [
-			'html' => $message,
-		];
-		$inline_opts = mailgun_inline_images($inline_opts);
-		$message = $inline_opts['html'];
-	}
-
-	if (get_input('view')) {
-		echo $message;
-	}
-
-	if (get_input('send')) {
-
-		// Test sending attachments through notify_user()
-		$to      = $user->guid;
-		$from    = $site->guid;
-		$subject = elgg_echo('mailgun:test:subject');
-		
-		$body = elgg_echo('mailgun:test:body', [
-			$user->name,
-			elgg_get_plugins_path() . 'mailgun/views/default/mailgun/notification/body.php',
-			$site->name,
-			$site->url
-		]);
-
-		$params = [
-			'recipient' => $user,
-			'attachments' => [
-				dirname(__DIR__) . '/mailgun/manifest.xml',
-			],
-		];
-
-		notify_user($to, $from, $subject, $body, $params, ['email']);
-	}
-
-	exit;
 }
 
 /**
@@ -143,8 +79,7 @@ function mailgun_test_page_handler()
  * @param object  $message  \ArckInteractive\Mailgun\Message
  * @return bool
  */
-function mailgun_sample_incoming_message_handler($event, $type, $message)
-{
+function mailgun_sample_incoming_message_handler($event, $type, $message) {
 	/* First we check to see if the message is for this plugin. 
 	 * Plugin developers will assign some unique value to their 
 	 * message after the + symbol in the recipient. 
@@ -166,17 +101,16 @@ function mailgun_sample_incoming_message_handler($event, $type, $message)
 
 		// This is a direct inbound message maybe to start a new blog post
 		error_log('Received a direct inbound message: ' . $message->getMessageId());
-
 	} else {
 
 		$options = array(
-			'type'    => 'object',
+			'type' => 'object',
 			'subtyle' => 'mailgun_sample',
-			'limit'   => 1,
+			'limit' => 1,
 			'annotation_name_value_pairs' => array(
-				'name'       => 'msg_token',
-				'value'      => $token,
-				'operator'   => '='
+				'name' => 'msg_token',
+				'value' => $token,
+				'operator' => '='
 			)
 		);
 
@@ -185,7 +119,6 @@ function mailgun_sample_incoming_message_handler($event, $type, $message)
 		if (!empty($entities)) {
 
 			// Process the reply to this entity
-
 			// Halt event propagation
 			return false;
 		}
@@ -200,20 +133,16 @@ function mailgun_sample_incoming_message_handler($event, $type, $message)
  *
  * @return object
  */
-function mailgun_client()
-{
-    $apiKey = elgg_get_plugin_setting('api_key', 'mailgun');
-    $domain = elgg_get_plugin_setting('domain', 'mailgun');
-    $path   = elgg_get_config("dataroot") . 'mailgun';
+function mailgun_client() {
+	$apiKey = elgg_get_plugin_setting('api_key', 'mailgun');
+	$domain = elgg_get_plugin_setting('domain', 'mailgun');
+	$path = elgg_get_config("dataroot") . 'mailgun';
 
-    try {
-        $client = new MGWrapper($apiKey, $domain, $path, false);
-    } catch (Exception $e) {
-        register_error($e->getMessage());
-    }
+	try {
+		$client = new MGWrapper($apiKey, $domain, $path, false);
+	} catch (Exception $e) {
+		register_error($e->getMessage());
+	}
 
-    return $client;
+	return $client;
 }
-
-
-
