@@ -1,6 +1,6 @@
-
 Mailgun Client for Elgg
 --------------------------
+![Elgg 2.0](https://img.shields.io/badge/Elgg-2.0.x-orange.svg?style=flat-square)
 
 *Mailgun* is a transactional Email API Service for developers by Rackspace. It offers a complete cloud-based email service for sending, receiving and tracking email sent through your websites and applications. 
 
@@ -78,13 +78,59 @@ I created an additional plugin that can be used as a further example called mail
 
 The following code samples show how to add a unique token to your outbound emails and to register for and receive email from the mailgun plugin.
 
-#### Sending notifications ####
+
+#### Tokens ####
+
+A mailgun token will be automically added to **subscription** notifications about objects, users and groups (e.g. when a new blog post is published).
+
+```php
+elgg_trigger_event('publish', 'object', $blog);
+
+// After subscription notifications are dispatched,
+// mailgun token can be accessed via metadata
+// as "mg:<action>:<entity_type>:<entity_subtype>"
+$mailgun_token = $blog->{"mg:publish:object:blog"};
+// or
+$mailgun_token = mailgun_get_entity_notification_token($blog, 'publish:object:blog');
+```
+
+You can customize the token added to subscription notifications, using the `"prepare","notification:<action>:<entity_type>:<entity_subtype>"` hook:
+
+```php
+elgg_register_plugin_hook_handler('prepare', 'notification:publish:object:blog', function($hook, $type, $notification) {
+   $notification->token = 'my-random-token';
+   return $notification;
+});
+```
+
+A mailgun token will be automatically added to **instant** notifications that have been assigned an object, e.g.
+
+```php
+notify_user($to, $from, $subject, $body, [
+   'action' => 'my_action',
+   'object' => $entity,
+]);
+```
+
+A mailgun token can be added to instant notification via params, e.g.
+
+```php
+notify_user($to, $from, $subject, $body, [
+   'token' => mailgun_get_entity_notification_token($object, 'action'),
+]);
+```
+
+You can also pass your token as `$params['token']` to `elgg_send_email()`.
+
+For automatically generated tokens, you can use `mailgun_get_entity_by_notification_token()` to map the token back to an entity.
+
+
+#### Custom instant notifications ####
 
 In this example we have a forum plugin that notifies subscribed members when a new topic is posted.
 
 ```php
-function send_new_topic_notification($topic)
-{
+function send_new_topic_notification($topic) {
 	// Notification options
 	$options = array(
 		'subject"  => $topic->title,
@@ -116,14 +162,20 @@ function send_new_topic_notification($topic)
 
 #### Receiving Replies ####
 
+By default, the plugin will attempt to match an incoming email to a notification event and
+store it as a comment (or reply for discussion topics) on a notification event object.
+This will apply to core `create`, `update` and `publish` events for registered object types.
+
+If an incoming email is matched to a personal message, it will sent to the recipient via
+the messages plugin.
+
 Now to handle all the deep and meaningful replies to the forum topic we can use something like this:
 
 ```php
 // Register for the receive message event
 elgg_register_event_handler('receive', 'mg_message', 'handle_topic_replies');
 
-function handle_topic_replies($message)
-{
+function handle_topic_replies($event, $type, $message) {
 	// Get the token from the recipient email
 	$token = $message->getRecipientToken();
 	

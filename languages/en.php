@@ -53,10 +53,24 @@ return array(
 		Site name: %s
 		Site URL: %s
 
-		This elgg logo is an embedded as an inline image:
+		This elgg logo is embedded as an inline image:
 
 		<img src="https://elgg.org/images/elgg_small.png">
 
 		The manifest for this plugin (manifest.xml) is included as an attachment.
-	'
+	',
+
+	'mailgun:inbound:fail:subject' => 'Your email response could not be saved',
+	'mailgun:inbound:fail:message' => '
+		Dear %s,
+
+		You have responded to an email notification, but unfortunately, we were not able to process it. Please login to the site at %s and resubmit your response using a corresponding site feature.
+
+		Details of the failing message:
+
+        %s
+
+        %s
+	',
+	
 );
