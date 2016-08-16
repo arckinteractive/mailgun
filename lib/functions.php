@@ -149,13 +149,18 @@ function mailgun_send_email(array $options = null) {
 		$attachments['inline'] = $options["inline"];
 	}
 
-	# Instantiate the Mailgun wrapper.
-	$mg = mailgun_client();
+	try {
+		# Instantiate the Mailgun wrapper.
+		$mg = mailgun_client();
 
-	# Make the call to the client.
-	$message_id = $mg->sendMessage($message, $attachments);
+		# Make the call to the client.
+		$message_id = $mg->sendMessage($message, $attachments);
 
-	return $message_id;
+		return $message_id;
+	} catch (\Exception $ex) {
+		elgg_log($ex->getMessage(), 'ERROR');
+		return false;
+	}
 }
 
 /**
@@ -584,19 +589,23 @@ function mailgun_get_entity_notification_token(ElggEntity $entity = null, $handl
  */
 function mailgun_get_entity_by_notifcation_token($token) {
 
+	$ia = elgg_set_ignore_access(true);
+
 	$token = sanitize_string($token);
 	$dbprefix = elgg_get_config('dbprefix');
 	$entities = elgg_get_entities([
 		'joins' => [
-			"JOIN {$dbprefix}entity_metadata md ON md.entity_guid = e.guid",
+			"JOIN {$dbprefix}metadata md ON md.entity_guid = e.guid",
 			"JOIN {$dbprefix}metastrings msn ON msn.id = md.name_id",
 			"JOIN {$dbprefix}metastrings msv ON msv.id = md.value_id",
 		],
 		'wheres' => [
-			"msn.string LIKE 'mg:%' AND msv.string = $token",
+			"msn.string LIKE 'mg:%' AND msv.string = '$token'",
 		],
 		'limit' => 1,
 	]);
+
+	elgg_set_ignore_access($ia);
 
 	return $entities ? $entities[0] : false;
 }

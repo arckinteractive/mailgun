@@ -4,6 +4,7 @@ include_once(dirname(__FILE__) . '/vendor/autoload.php');
 
 require_once(dirname(__FILE__) . '/lib/functions.php');
 require_once(dirname(__FILE__) . '/lib/hooks.php');
+require_once(dirname(__FILE__) . '/lib/events.php');
 
 use ArckInteractive\Mailgun\MGWrapper;
 
@@ -38,7 +39,11 @@ function mailgun_init() {
 	elgg_unregister_plugin_hook_handler('send', 'notification:email', '_elgg_send_email_notification');
 	elgg_register_plugin_hook_handler('send', 'notification:email', 'mailgun_send_email_notification');
 
-	// A sample event handler
+	// Handle incoming mail
+	// Setting higher priority, so that other plugins' handlers are called first
+	elgg_register_event_handler('receive', 'mg_message', 'mailgun_incoming_message_handler', 800);
+
+	// A sample event handler (for testing)
 	//elgg_register_event_handler('receive', 'mg_message', 'mailgun_sample_incoming_message_handler');
 
 	$action_base = elgg_get_plugins_path() . 'mailgun/actions';
@@ -70,63 +75,6 @@ function mailgun_page_handler($page) {
 	}
 
 	return true;
-}
-
-/**
- * Return our Mailgun client wrapper
- * 
- * The Mailgun HTTP client can be interacted with directly
- * by fetching the client with the getClient() method.
- *
- * @param string  $event
- * @param string  $type
- * @param object  $message  \ArckInteractive\Mailgun\Message
- * @return bool
- */
-function mailgun_sample_incoming_message_handler($event, $type, $message) {
-	/* First we check to see if the message is for this plugin. 
-	 * Plugin developers will assign some unique value to their 
-	 * message after the + symbol in the recipient. 
-	 * 
-	 * This could be a unique token that is generated when a 
-	 * notification is sent that allows a user to reply to the 
-	 * email e.g. site1+a2bdy4dokf5dbs42ndasotirqn@em.mysite.com
-
-	 * Or for emails coming in that are not from a reply this could 
-	 * be a unique string e.g. site1+my_plugin@em.mysite.com
-	 */
-
-	// Get the unique token or string from the recipient
-	$token = $message->getRecipientToken();
-
-	// Direct imbound messages for this plugin use mgsample
-	// as the token.
-	if (preg_match("/mgsample/", $token)) {
-
-		// This is a direct inbound message maybe to start a new blog post
-		error_log('Received a direct inbound message: ' . $message->getMessageId());
-	} else {
-
-		$options = array(
-			'type' => 'object',
-			'subtyle' => 'mailgun_sample',
-			'limit' => 1,
-			'annotation_name_value_pairs' => array(
-				'name' => 'msg_token',
-				'value' => $token,
-				'operator' => '='
-			)
-		);
-
-		$entities = elgg_get_entities_from_annotations($options);
-
-		if (!empty($entities)) {
-
-			// Process the reply to this entity
-			// Halt event propagation
-			return false;
-		}
-	}
 }
 
 /**

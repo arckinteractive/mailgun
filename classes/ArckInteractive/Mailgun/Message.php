@@ -2,11 +2,16 @@
 
 namespace ArckInteractive\Mailgun;
 
+use Elgg\Mail\Address;
+use LogicException;
+use Ramsey\Uuid\Uuid;
+use stdClass;
+
 class Message {
 
 	private $message = null;
 
-	function __construct(\stdClass $message) {
+	function __construct(stdClass $message) {
 		$this->message = array_change_key_case((array) $message);
 	}
 
@@ -60,13 +65,64 @@ class Message {
 
 	/**
 	 * Convenience method to parse the rescipient token
-	 * from the recipient.
-	 *
-	 * @return mixed
+	 * from the recipient email
+	 * @return string
 	 */
 	public function getRecipientToken() {
-		if (preg_match("/\+(\S+)@.*/", $this->getTo(), $matches)) {
+		if (preg_match("/\+(\S+)@.*/", $this->getToEmail(), $matches)) {
 			return $matches[1];
+		}
+		return '';
+	}
+
+	/**
+	 * Get To email
+	 * @return string
+	 */
+	public function getToEmail() {
+		$address = Address::fromString($this->getTo());
+		return $address->getEmail();
+	}
+
+	/**
+	 * Parses From email address
+	 * @return string
+	 */
+	public function getFromEmail() {
+		$address = Address::fromString($this->getFrom());
+		return $address->getEmail();
+	}
+
+	/**
+	 * Parses From name
+	 * @return string
+	 */
+	public function getFromName() {
+		$address = Address::fromString($this->getFrom());
+		return $address->getName();
+	}
+
+	/**
+	 * Get sender as an ElggUser
+	 * @return \ElggUser|false
+	 */
+	public function getSender() {
+		$from = $this->getFromEmail();
+		$sender = get_user_by_email($from);
+		return ($sender) ? $sender[0] : false;
+	}
+
+	/**
+	 * Returns plaintext version of the email
+	 * 
+	 * @param bool $stripped If true, will strip email signature and quoted part
+	 * @return string
+	 */
+	public function getText($stripped = true) {
+		if ($stripped) {
+			return $this->message['stripped-text'];
+		} else {
+			return $this->message['body-plain'];
 		}
 	}
 
@@ -83,18 +139,21 @@ class Message {
 		}
 
 		if (preg_match('/\+/', $email)) {
-			throw new Exception('The email address already includes a token.');
+			throw new LogicException('The email address already includes a token.');
 		}
 
 		if (!$token) {
-			$token = preg_replace('/-/', '', \Ramsey\Uuid\Uuid::uuid1()->toString());
+			$token = Uuid::uuid1()->toString();
 		}
 
 		$parts = explode('@', $email);
 
 		$newEmail = $parts[0] . '+' . $token . '@' . $parts[1];
 
-		return array('email' => $newEmail, 'token' => $token);
+		return array(
+			'email' => $newEmail,
+			'token' => $token,
+		);
 	}
 
 }

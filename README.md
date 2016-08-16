@@ -130,8 +130,7 @@ For automatically generated tokens, you can use `mailgun_get_entity_by_notificat
 In this example we have a forum plugin that notifies subscribed members when a new topic is posted.
 
 ```php
-function send_new_topic_notification($topic)
-{
+function send_new_topic_notification($topic) {
 	// Notification options
 	$options = array(
 		'subject"  => $topic->title,
@@ -163,14 +162,20 @@ function send_new_topic_notification($topic)
 
 #### Receiving Replies ####
 
+By default, the plugin will attempt to match an incoming email to a notification event and
+store it as a comment (or reply for discussion topics) on a notification event object.
+This will apply to core `create`, `update` and `publish` events for registered object types.
+
+If an incoming email is matched to a personal message, it will sent to the recipient via
+the messages plugin.
+
 Now to handle all the deep and meaningful replies to the forum topic we can use something like this:
 
 ```php
 // Register for the receive message event
 elgg_register_event_handler('receive', 'mg_message', 'handle_topic_replies');
 
-function handle_topic_replies($message)
-{
+function handle_topic_replies($event, $type, $message) {
 	// Get the token from the recipient email
 	$token = $message->getRecipientToken();
 	
