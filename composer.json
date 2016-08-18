@@ -3,6 +3,16 @@
 	"description": "Bi-directional email handling via Mailgun",
 	"type": "elgg-plugin",
 	"keywords": ["elgg", "plugin", "notification", "email"],
+	"authors": [
+		{
+			"name": "Billy Gunn",
+			"email": "billy@arckinteractive.com"
+		},
+		{
+			"name": "Ismayil Khayredinov",
+			"email": "ismayil@arckinteractive.com"
+		}
+	],
 	"license": "GPL-2.0",
 	"require": {
 		"composer/installers": "^1.0.8",
