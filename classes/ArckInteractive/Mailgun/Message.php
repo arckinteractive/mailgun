@@ -165,7 +165,7 @@ class Message {
 
 		$subtype = elgg_extract('subtype', $attributes, 'file', false);
 		unset($attributes['subtype']);
-		
+
 		$class = get_subtype_class('object', $subtype);
 		if (!$class || !class_exists($class) || !is_subclass_of($class, ElggFile::class)) {
 			$class = ElggFile::class;
@@ -226,6 +226,14 @@ class Message {
 	}
 
 	/**
+	 * Returns sanitized subject
+	 * @return string
+	 */
+	public function getSubject() {
+		return filter_tags($this->message['subject']);
+	}
+
+	/**
 	 * Returns plaintext version of the email
 	 * 
 	 * @param bool $stripped If true, will strip email signature and quoted part
@@ -233,9 +241,9 @@ class Message {
 	 */
 	public function getText($stripped = true) {
 		if ($stripped) {
-			return $this->message['stripped-text'];
+			return filter_tags($this->message['stripped-text']);
 		} else {
-			return $this->message['body-plain'];
+			return filter_tags($this->message['body-plain']);
 		}
 	}
 
