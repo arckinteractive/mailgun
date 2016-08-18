@@ -2,8 +2,12 @@
 
 namespace ArckInteractive\Mailgun;
 
-use Mailgun\Mailgun;
+use Elgg\Mail\Address;
 use Flintstone\Flintstone;
+use Http\Adapter\Guzzle6\Client;
+use Mailgun\Mailgun;
+use stdClass;
+use Exception;
 
 class MGWrapper {
 
@@ -53,7 +57,7 @@ class MGWrapper {
 	private $responseMessage = null;
 
 	/**
-	 * @var \Http\Adapter\Guzzle6\Client 
+	 * @var Client
 	 */
 	private $httpClient;
 
@@ -71,8 +75,8 @@ class MGWrapper {
 		$this->storage = $path;
 
 		try {
-			$this->httpClient = new \Http\Adapter\Guzzle6\Client();
-			$this->client = new Mailgun($this->apiKey, $httpClient);
+			$this->httpClient = new Client();
+			$this->client = new Mailgun($this->apiKey, $this->httpClient);
 		} catch (Exception $e) {
 			throw new Exception("Failed to initialize Mailgun client");
 		}
@@ -121,8 +125,8 @@ class MGWrapper {
 	 *
 	 * See https://documentation.mailgun.com/user_manual.html#sending-via-api
 	 *
-	 * @param array $options The message options
-	 * @param mixed $attachements An array of message attachments or null
+	 * @param array $options     The message options
+	 * @param mixed $attachments An array of message attachments or null
 	 * @return mixed
 	 */
 	public function sendMessage($options, $attachments = array()) {
@@ -215,8 +219,8 @@ class MGWrapper {
 	/**
 	 * Triggers event handling and logs the message
 	 *
-	 * @param \ArckInteractive\Mailgun\Message $message
-	 * @return void
+	 * @param Message $message Message
+	 * @return bool Has the message been received
 	 */
 	public function processMessage($message) {
 		// Trigger the receive event so that plugins can process the message
@@ -234,11 +238,14 @@ class MGWrapper {
 				], $sender->language);
 				notify_user($sender->guid, $site->guid, $subject, $body);
 			}
+			return false;
 		}
 
 		if ($this->logMessages) {
 			$this->logMessage($message);
 		}
+
+		return true;
 	}
 
 	/**
@@ -264,43 +271,50 @@ class MGWrapper {
 	public function processStoredMessages() {
 		while ($items = $this->getStoredEvents()) {
 			foreach ($items as $item) {
-
-				$message_id = $item->message->headers->{'message-id'};
-				if ($this->retrieveId($message_id)) {
-					// Already processed
-					continue;
-				}
-				
-				// Store the message ID to save cycles on future runs
-				$this->storeId($message_id);
-
-				$address = \Elgg\Mail\Address::fromString($item->message->headers->to);
-
-				$recipient = preg_quote($this->recipient);
-				$domain = preg_quote($this->domain);
-				
-				$pattern = "/^{$recipient}\+*\S*@{$domain}$/i";
-				
-				if (!preg_match($pattern, $address->getEmail())) {
-					// Verify this message is for us as recipient filtering on stored messages is broken.
-					continue;
-				}
-
-				try {
-					// Fetch the message from Mailgun storage
-					
-					// Messages are stored on subdomains, so we have to customize the client
-					$storage_url = $item->storage->url;
-					$parts = parse_url($storage_url);
-
-					$client = new Mailgun($this->apiKey, $this->httpClient, $parts['host']);
-					$results = $client->get("domains/{$this->domain}/messages/{$item->storage->key}");
-					
-					$this->processMessage(new Message($results->http_response_body));
-				} catch (Exception $e) {
-					error_log($e->getMessage());
-				}
+				$this->processStoredMessage($item);
 			}
+		}
+	}
+
+	/**
+	 * Process stored message object
+	 *
+	 * @param stdClass $message Message from storage
+	 * @return boolean
+	 */
+	public function processStoredMessage(stdClass $message) {
+		
+		$message_id = $message->message->headers->{'message-id'};
+		if ($this->retrieveId($message_id)) {
+			// Already processed
+			return false;
+		}
+
+		// Store the message ID to save cycles on future runs
+		//$this->storeId($message_id);
+
+		$address = Address::fromString($message->message->headers->to);
+
+		$recipient = preg_quote($this->recipient);
+		$domain = preg_quote($this->domain);
+
+		$pattern = "/^{$recipient}\+*\S*@{$domain}$/i";
+
+		if (!preg_match($pattern, $address->getEmail())) {
+			// Verify this message is for us as recipient filtering on stored messages is broken.
+			return false;
+		}
+
+		try {
+			// Fetch the message from Mailgun storage			
+			$results = $this->fetch($message->storage->url);
+			if (empty($results)) {
+				return false;
+			}
+			return $this->processMessage(new Message($results->http_response_body));
+		} catch (Exception $e) {
+			error_log($e->getMessage());
+			return false;
 		}
 	}
 
@@ -443,6 +457,34 @@ class MGWrapper {
 		$path = $path . '/' . $id;
 
 		file_put_contents($path, print_r($message->getRawMessage(), true));
+	}
+
+	/**
+	 * Instantiates a new client for a given absolute URL and
+	 * fetches the results
+	 * Mailgun API endpoints return absolute URLs for fetching
+	 * message details and attachments. SDK can't really handle
+	 * requests to absolute URLs
+	 *
+	 * @param string $url URL of the request
+	 * @return self
+	 */
+	public static function fetch($url) {
+
+		$pattern = "/^http(s):\/\/([^\/]+)\/(v\d)\/(.*)$/i";
+
+		$matches = [];
+		preg_match($pattern, $url, $matches);
+
+		$domain = isset($matches[2]) ? $matches[2] : 'api.mailgun.net';
+		//$api_version = isset($matches[3]) ? (int) $matches[3] : 'v3';
+		$endpoint = isset($matches[4]) ? $matches[4] : $url;
+		
+		$api_key = elgg_get_plugin_setting('api_key', 'mailgun');
+		
+		$client = new Mailgun($api_key, new Client(), $domain);
+		//$client->setApiVersion($api_version);
+		return $client->get($endpoint);
 	}
 
 }
