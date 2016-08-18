@@ -80,7 +80,7 @@ function mailgun_create_discussion(Message $message) {
 	if (!elgg_is_active_plugin('discussions')) {
 		return false;
 	}
-	
+
 	$sender = $message->getSender();
 	if (!$sender) {
 		return false;
@@ -135,6 +135,14 @@ function mailgun_create_discussion(Message $message) {
 		}
 	}
 
+	elgg_create_river_item(array(
+		'view' => 'river/object/discussion/create',
+		'action_type' => 'create',
+		'subject_guid' => $sender->guid,
+		'object_guid' => $response->guid,
+		'target_guid' => $response->container_guid,
+	));
+
 	elgg_log("Message {$message->getMessageId()} has been saved as a comment [guid: {$response->guid}] "
 	. "on {$entity->getDisplayName()} [guid: {$entity->guid}]");
 
@@ -148,7 +156,7 @@ function mailgun_create_discussion(Message $message) {
  * @return bool
  */
 function mailgun_create_response(Message $message) {
-	
+
 	$sender = $message->getSender();
 	if (!$sender) {
 		return false;
@@ -219,6 +227,24 @@ function mailgun_create_response(Message $message) {
 		}
 	}
 
+	if ($response_type == 'discussion_reply') {
+		elgg_create_river_item(array(
+			'view' => 'river/object/discussion_reply/create',
+			'action_type' => 'reply',
+			'subject_guid' => $sender->guid,
+			'object_guid' => $response->guid,
+			'target_guid' => $response->container_guid,
+		));
+	} else {
+		elgg_create_river_item(array(
+			'view' => 'river/object/comment/create',
+			'action_type' => 'comment',
+			'subject_guid' => $sender->guid,
+			'object_guid' => $response->guid,
+			'target_guid' => $response->container_guid,
+		));
+	}
+
 	elgg_log("Message {$message->getMessageId()} has been saved as a comment [guid: {$response->guid}] "
 	. "on {$entity->getDisplayName()} [guid: {$entity->guid}]");
 
@@ -236,7 +262,7 @@ function mailgun_create_response(Message $message) {
 function mailgun_incoming_message_handler($event, $type, $message) {
 
 	$entity = $message->getTargetEntity();
-	
+
 	if ($entity instanceof ElggUser || elgg_instanceof($entity, 'object', 'messages')) {
 		// inbound message is targeted at a user or is a response to a personal message
 		$created = mailgun_create_personal_message($message);
