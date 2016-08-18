@@ -291,7 +291,7 @@ class MGWrapper {
 		}
 
 		// Store the message ID to save cycles on future runs
-		//$this->storeId($message_id);
+		$this->storeId($message_id);
 
 		$address = Address::fromString($message->message->headers->to);
 
