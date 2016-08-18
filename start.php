@@ -1,6 +1,6 @@
 <?php
 
-include_once(dirname(__FILE__) . '/vendor/autoload.php');
+include_once(dirname(__FILE__) . '/autoloader.php');
 
 require_once(dirname(__FILE__) . '/lib/functions.php');
 require_once(dirname(__FILE__) . '/lib/hooks.php');
