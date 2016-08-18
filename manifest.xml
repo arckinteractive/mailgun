@@ -22,9 +22,10 @@
 
 	<suggests>
 		<type>plugin</type>
-		<name>mailgun_messages</name>
+		<name>hypeAttachments</name>
+		<version>2.0</version>
 	</suggests>
- 	
+
  	<conflicts>
 		<type>plugin</type>
 		<name>phpmailer</name>
