@@ -34,7 +34,12 @@ function mailgun_create_personal_message(Message $message) {
 
 	$attachments = [];
 	if (elgg_is_active_plugin('hypeAttachments')) {
-		$attachments = $message->getAttachments();
+		$attributes = [
+			'origin' => ['mailgun', 'attachments'],
+			'subtype' => 'file',
+			'owner_guid' => $sender->guid,
+		];
+		$attachments = $message->getAttachments($attributes);
 		$attachment_guids = [];
 		foreach ($attachments as $attachment) {
 			$attachment_guids[] = $attachment->guid;
@@ -60,6 +65,78 @@ function mailgun_create_personal_message(Message $message) {
 
 	elgg_log("Message {$message->getMessageId()} has been saved "
 	. "as personal message to {$entity->getDisplayName()}");
+
+	return true;
+}
+
+/**
+ * Create a new discussion topic from an inbound email
+ *
+ * @param Message $message Incoming message
+ * @return bool
+ */
+function mailgun_create_discussion(Message $message) {
+
+	if (!elgg_is_active_plugin('discussions')) {
+		return false;
+	}
+	
+	$sender = $message->getSender();
+	if (!$sender) {
+		return false;
+	}
+
+	$entity = $message->getTargetEntity();
+	if (!$entity) {
+		return false;
+	}
+
+	if (!$entity->canWriteToContainer($sender->guid, 'object', 'discussion')) {
+		// The sender is not allowed to create discussions
+		return false;
+	}
+
+	$class = get_subtype_class('object', 'discussion');
+	if (!$class) {
+		$class = ElggObject::class;
+	}
+
+	$subject = $message->getSubject();
+	$body = $message->getText();
+
+	$ia = elgg_set_ignore_access(true);
+
+	$response = new $class();
+	$response->subtype = 'discussion';
+	$response->owner_guid = $sender->guid;
+	$response->container_guid = $entity->guid;
+	$response->title = $subject;
+	$response->description = $body;
+	$response->access_id = $entity->group_acl ? : $entity->access_id;
+	$guid = $response->save();
+
+	elgg_set_ignore_access($ia);
+
+	if (!$guid) {
+		return false;
+	}
+
+	if (elgg_is_active_plugin('hypeAttachments')) {
+		$attributes = [
+			'origin' => ['mailgun', 'attachments'],
+			'subtype' => 'file',
+			'access_id' => $response->access_id,
+			'owner_guid' => $sender->guid,
+			'container_guid' => $response->container_guid,
+		];
+		$attachments = $message->getAttachments($attributes);
+		foreach ($attachments as $attachment) {
+			hypeapps_attach($response, $attachment);
+		}
+	}
+
+	elgg_log("Message {$message->getMessageId()} has been saved as a comment [guid: {$response->guid}] "
+	. "on {$entity->getDisplayName()} [guid: {$entity->guid}]");
 
 	return true;
 }
@@ -129,12 +206,15 @@ function mailgun_create_response(Message $message) {
 	}
 
 	if (elgg_is_active_plugin('hypeAttachments')) {
-		$attachments = $message->getAttachments();
+		$attributes = [
+			'origin' => ['mailgun', 'attachments'],
+			'subtype' => 'file',
+			'access_id' => $response->access_id,
+			'owner_guid' => $sender->guid,
+			'container_guid' => $response->container_guid,
+		];
+		$attachments = $message->getAttachments($attributes);
 		foreach ($attachments as $attachment) {
-			$attachment->origin = 'attachments';
-			$attachment->access_id = $response->access_id;
-			$attachment->container_guid = $response->container_guid;
-			$attachment->save();
 			hypeapps_attach($response, $attachment);
 		}
 	}
@@ -162,7 +242,7 @@ function mailgun_incoming_message_handler($event, $type, $message) {
 		$created = mailgun_create_personal_message($message);
 	} else if ($entity instanceof ElggGroup) {
 		// inbound messages targeted at a group become discussion topics
-		//$created = mailgun_create_discussion($message);
+		$created = mailgun_create_discussion($message);
 	} else if ($entity instanceof ElggObject) {
 		$created = mailgun_create_response($message);
 	}

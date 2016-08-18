@@ -171,6 +171,8 @@ class Message {
 			$class = ElggFile::class;
 		}
 
+		$ia = elgg_set_ignore_access(true);
+
 		foreach ($attachments as $attachment) {
 			$raw = MGWrapper::fetch($attachment->url);
 			if (!$raw || empty($raw->http_response_body)) {
@@ -217,6 +219,8 @@ class Message {
 
 			$files[] = $file;
 		}
+
+		elgg_set_ignore_access($ia);
 
 		return $files;
 	}
