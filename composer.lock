@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "41c8fa88ed066253cc439dbfab6254aa",
+    "hash": "852b270ca57f1961cc335a1848a33e24",
     "content-hash": "afcebc2b939ae624bd64b15f0405825b",
     "packages": [
         {
@@ -378,16 +378,16 @@
         },
         {
             "name": "mailgun/mailgun-php",
-            "version": "v2.1.1",
+            "version": "v2.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mailgun/mailgun-php.git",
-                "reference": "88a3e96733cbcda181980a36d074901304ac8f14"
+                "reference": "54b7f851b8e0241d593897dc2d50906bf4a43995"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mailgun/mailgun-php/zipball/88a3e96733cbcda181980a36d074901304ac8f14",
-                "reference": "88a3e96733cbcda181980a36d074901304ac8f14",
+                "url": "https://api.github.com/repos/mailgun/mailgun-php/zipball/54b7f851b8e0241d593897dc2d50906bf4a43995",
+                "reference": "54b7f851b8e0241d593897dc2d50906bf4a43995",
                 "shasum": ""
             },
             "require": {
@@ -404,7 +404,6 @@
             "type": "library",
             "autoload": {
                 "psr-0": {
-                    "Mailgun\\Tests": "tests/",
                     "Mailgun": "src/"
                 }
             },
@@ -419,7 +418,7 @@
                 }
             ],
             "description": "The Mailgun SDK provides methods for all API functions.",
-            "time": "2016-07-21 08:54:55"
+            "time": "2016-08-10 16:58:18"
         },
         {
             "name": "paragonie/random_compat",
