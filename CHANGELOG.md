@@ -1,3 +1,13 @@
+<a name="2.0.3"></a>
+## [2.0.3](https://github.com/arckinteractive/mailgun/compare/2.0.2...v2.0.3) (2016-08-22)
+
+
+### Bug Fixes
+
+* **views:** do not assume that all hook handlers are functions ([7bbbc63](https://github.com/arckinteractive/mailgun/commit/7bbbc63))
+
+
+
 <a name="2.0.2"></a>
 ## [2.0.2](https://github.com/arckinteractive/mailgun/compare/2.0.1...v2.0.2) (2016-08-22)
 
