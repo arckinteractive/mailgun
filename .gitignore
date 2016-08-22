@@ -8,3 +8,4 @@ robots.txt
 /releases/
 /vendor/
 /mod/
+composer.lock
