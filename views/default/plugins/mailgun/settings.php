@@ -1,7 +1,6 @@
 <?php
-
 $offset = get_input('offset', 0);
-$limit  = get_input('offset', 20);
+$limit = get_input('offset', 20);
 
 $plugin = elgg_extract("entity", $vars);
 
@@ -10,12 +9,12 @@ $routes = array();
 
 // Retrieve configured routes from Mailgun
 if ($plugin->api_key) {
-    try {
-        $mg     = mailgun_client();
-        $routes = $mg->getRoutes($offset, $limit);
-    } catch (Exception $e) {
-        register_error($e->getMessage());
-    }
+	try {
+		$mg = mailgun_client();
+		$routes = $mg->getRoutes($offset, $limit);
+	} catch (Exception $e) {
+		register_error($e->getMessage());
+	}
 }
 
 // Get configured hook handlers
@@ -23,11 +22,10 @@ $handlers = elgg_get_ordered_event_handlers('receive', 'mg_message');
 
 // Escaped path for use in regex
 $path = str_replace("/", "\/", elgg_get_config('path'));
-
 ?>
 
 <style>
-    
+
     .settings-section { border: 1px solid #ccc; margin: 20px 0; }
 
     .settings-section > .settings-head {
@@ -46,9 +44,9 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
 
     .settings-section > .settings-body { padding: 10px; }
 
-    .elgg-form-settings { max-width: 100% !important; } 
+    .elgg-form-settings { max-width: 100% !important; }
     .section-head { background-color: #c2d1d9; font-weight: bold; padding:5px; margin-bottom: 10px; font-size: 15px;}
-    .clickable { cursor: pointer; } 
+    .clickable { cursor: pointer; }
     table { table-layout:fixed; width: 100%; }
     td,th { padding: 5px 5px 5px 0; }
     th { font-weight: bold; }
@@ -58,11 +56,11 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
 </style>
 
 <script>
-    function mgSendTestEmail() {
-        $.get(elgg.config.wwwroot + 'mg/test?send=1', function(data) { 
-            alert('Test email sent to your email address'); 
-        });
-    }
+	function mgSendTestEmail() {
+		$.get(elgg.config.wwwroot + 'mg/test?send=1', function (data) {
+			alert('Test email sent to your email address');
+		});
+	}
 </script>
 
 <div class="settings-section">
@@ -76,21 +74,22 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
 
         <p>
             <label><?php echo elgg_echo("mailgun:settings:apikey"); ?>:</label>
-            <?php echo elgg_view("input/text", array("name" => "params[api_key]", "value" => $plugin->api_key)); ?>
+			<?php echo elgg_view("input/text", array("name" => "params[api_key]", "value" => $plugin->api_key)); ?>
         </p>
 
         <p>
             <label><?php echo elgg_echo("mailgun:settings:domain"); ?>:</label>
-            <?php echo elgg_view("input/text", array("name" => "params[domain]", "value" => $plugin->domain)); ?>
+			<?php echo elgg_view("input/text", array("name" => "params[domain]", "value" => $plugin->domain)); ?>
         </p>
 
         <p>
             <label><?php echo elgg_echo("mailgun:settings:embed"); ?>:</label>
-            <?php echo elgg_view("input/select", array(
-                'name'           => "params[embed_images]", 
-                'options_values' => array(0 => 'No', 1 => 'Yes'), 
-                'value'          => $plugin->embed_images)); 
-            ?>
+			<?php
+			echo elgg_view("input/select", array(
+				'name' => "params[embed_images]",
+				'options_values' => array(0 => 'No', 1 => 'Yes'),
+				'value' => $plugin->embed_images));
+			?>
         </p>
 
         <a href="<?php echo elgg_get_site_url(); ?>mg/test?view=1" target="_blank" class="elgg-button elgg-button-action">
@@ -136,44 +135,46 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
 
             <div class="section-head">Routes:</div>
 
-            <?php if (!empty($routes)): ?>
+			<?php if (!empty($routes)): ?>
 
-                <table id="routes">
-                    <thead>
-                        <tr>             
-                            <th style="width: 10%;">Priority</th>
-                            <th style="width: 30%">Expression</th>
-                            <th style="width: 30%">Actions</th>
-                            <th style="width: 20%">Description</th>
-                            <th style="width: 10%;">&nbsp;</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+				<table id="routes">
+					<thead>
+						<tr>
+							<th style="width: 10%;">Priority</th>
+							<th style="width: 30%">Expression</th>
+							<th style="width: 30%">Actions</th>
+							<th style="width: 20%">Description</th>
+							<th style="width: 10%;">&nbsp;</th>
+						</tr>
+					</thead>
+					<tbody>
 
-                        <?php foreach ($routes as $route): ?>
-                    
-                            <tr>
-                                <td><?php echo $route->priority; ?></td>
-                                <td><?php echo $route->expression; ?></td>
-                                <td><?php echo implode("<br/>\n", $route->actions) . '<br/>'; ?></td>
-                                <td><?php echo $route->description; ?></td>
-                                <td style="text-align: right;">
-                                    <?php echo elgg_view('output/url', array(
-                                        'text'      => 'delete',
-                                        'href'      => '/action/plugins/settings/save?plugin_id=' . $plugin->getID() . '&route_id=' . $route->id,
-                                        'is_action' => true,
-                                        'confirm'   => 'Delete this route?',
-                                        'style'     => 'color: #9d0000;'
-                                    )); ?>
-                                </td>
-                            </tr>
+						<?php foreach ($routes as $route): ?>
 
-                        <?php endforeach; ?>
-                    
-                    </tbody>
-                </table>
-            
-            <?php endif; ?>
+							<tr>
+								<td><?php echo $route->priority; ?></td>
+								<td><?php echo $route->expression; ?></td>
+								<td><?php echo implode("<br/>\n", $route->actions) . '<br/>'; ?></td>
+								<td><?php echo $route->description; ?></td>
+								<td style="text-align: right;">
+									<?php
+									echo elgg_view('output/url', array(
+										'text' => 'delete',
+										'href' => '/action/plugins/settings/save?plugin_id=' . $plugin->getID() . '&route_id=' . $route->id,
+										'is_action' => true,
+										'confirm' => 'Delete this route?',
+										'style' => 'color: #9d0000;'
+									));
+									?>
+								</td>
+							</tr>
+
+						<?php endforeach; ?>
+
+					</tbody>
+				</table>
+
+			<?php endif; ?>
         </div>
 
         <div style="margin-top:20px;padding-right: 5px;">
@@ -181,7 +182,7 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
             <a href="javascript:void(0);" id="add-route-btn" onClick="$(this).hide(); $('#add-route').show('slow');" class="elgg-button elgg-button-action">
                 Add Route
             </a>
-       
+
             <table id="add-route">
                 <tr>
                     <td style="width: 110px;"><strong><?php echo elgg_echo('Priority'); ?>:</strong> </td>
@@ -219,37 +220,18 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
             <div class="section-head">Registered Handlers:</div>
 
             <div class='elgg-subtext'><?php echo elgg_echo("mailgun:settings:handlers:subtext"); ?></div>
-        
-            <table style="margin-top: 10px;">
-                <?php if (!empty($handlers)): ?>
 
-                    <tr>
-                        <th>Plugin</th>
-                        <th>File</th>
-                        <th>Handler</th>
-                    </tr>
-                    
-                    <?php foreach ($handlers as $hook): ?>
-                   
-                        <?php $reflFunc = new ReflectionFunction($hook); ?>
-
-                        <?php preg_match("/{$path}mod\/(\w+)\/(\S+)/", $reflFunc->getFileName(), $match); ?>
-
-                        <?php if (!isset($match[1])) continue; ?>
-
-                        <tr>
-                            <td><?php echo $match[1]; ?></td>
-                            <td><?php echo $match[2]; ?></td>
-                            <td><?php echo $hook; ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-
-                <?php else: ?>
-                    <tr><td colspan="2"><strong>There are no registered event handlers</strong></td></tr>
-                <?php endif; ?>
-            </table>
+			<?php
+			if (!empty($handlers)) {
+				foreach ($handlers as $hook) {
+					$inspector = new \Elgg\Debug\Inspector();
+					echo '<p>' . $inspector->describeCallable($hook) . '</p>';
+				}
+			} else {
+				echo "<p>There are no registered event handlers</p>";
+			}
+			?>
         </div>
-
 
     </div>
 </div>
@@ -264,12 +246,12 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
 
         <div>
             <label><?php echo elgg_echo("mailgun:settings:polling"); ?>: </label>
-            <?php echo elgg_view("input/checkbox", array('name' => 'params[polling]', 'value' => 1, 'checked' => $plugin->polling ? 'checked' : false)); ?>
-            
+			<?php echo elgg_view("input/checkbox", array('name' => 'params[polling]', 'value' => 1, 'checked' => $plugin->polling ? 'checked' : false)); ?>
+
             <div style="margin-top:3px;" class='elgg-subtext'>
-                <?php echo elgg_echo("mailgun:settings:polling:subtext"); ?>
+				<?php echo elgg_echo("mailgun:settings:polling:subtext"); ?>
             </div>
-            
+
             <div style="margin-top:3px;" class='elgg-subtext'>
                 */1 * * * *  /usr/bin/wget -O - <?php echo elgg_get_site_url(); ?>cron/minute/ > /dev/null 2>&1
             </div>
@@ -279,7 +261,7 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
 
         <div>
             <label><?php echo elgg_echo("mailgun:settings:stored:recipient"); ?>:</label>
-            <?php echo elgg_view("input/text", array("name" => "params[recipient]", "value" => $plugin->recipient)); ?>
+			<?php echo elgg_view("input/text", array("name" => "params[recipient]", "value" => $plugin->recipient)); ?>
             <div style="margin-top:3px;" class='elgg-subtext'><?php echo elgg_echo('mailgun:settings:stored:recipient:subtext'); ?></div>
         </div>
 
@@ -287,7 +269,7 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
 
         <div>
             <label><?php echo elgg_echo("mailgun:settings:event:age"); ?>:</label>
-            <?php echo elgg_view("input/text", array("name" => "params[event_age]", "value" => $plugin->event_age ? $plugin->event_age : 1800)); ?>
+			<?php echo elgg_view("input/text", array("name" => "params[event_age]", "value" => $plugin->event_age ? $plugin->event_age : 1800)); ?>
             <div style="margin-top:3px;padding-right:5px;" class='elgg-subtext'><?php echo elgg_echo('mailgun:settings:event:age:subtext'); ?></div>
         </div>
     </div>
