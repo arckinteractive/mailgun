@@ -28,6 +28,9 @@ return array(
 
 	'mailgun:settings:stored:info' => 'If a route has been configured to store messages then use the options below to configure message retrieval.',
 
+	'mailgun:settings:project' => 'Name of the project',
+	'mailgun:settings:project:subtext' => 'You can set this value to be able to distinguish between multiple projects on the same domain. This name will be used for outgoing emails, so you can use it in recipient matching below. E.g. if your project name is fancyproject, you can match by "fancyproject.*@domain.com"',
+
 	'mailgun:settings:stored:recipient'         => 'Recipient Match',
 	'mailgun:settings:stored:recipient:subtext' => 'e.g. site2 would match on a message sent to site2+uniquetoken@em.domain.com and a route expression like match_recipient("^site2\+.*@em.domain.com")',
 

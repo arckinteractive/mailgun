@@ -39,7 +39,14 @@ function mailgun_send_email_notification($hook, $type, $result, $params) {
 	$to = $recipient->email;
 
 	$site = elgg_get_site_entity();
-	$from = $site->email ? : 'noreply@' . $site->getDomain(); // Always use site email
+	$domain = elgg_get_plugin_setting('domain', 'mailgun');
+	$project = elgg_get_plugin_setting('project', 'mailgun');
+	if ($project) {
+		$from = "$project@$domain";
+	} else {
+		$from = "noreply@$domain";
+	}
+	
 	$params['from_name'] = $sender->getDisplayName(); // But set the name to that of the sender
 
 	// was the token provided with $params through notify_user()
