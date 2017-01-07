@@ -84,7 +84,7 @@ $path = str_replace("/", "\/", elgg_get_config('path'));
 
 		<div>
             <label><?php echo elgg_echo("mailgun:settings:project"); ?>:</label>
-			<?php echo elgg_view("input/text", array("name" => "params[project]", "value" => $plugin->recipient)); ?>
+			<?php echo elgg_view("input/text", array("name" => "params[project]", "value" => $plugin->project)); ?>
             <div style="margin-top:3px;" class='elgg-subtext'><?php echo elgg_echo('mailgun:settings:project:subtext'); ?></div>
         </div>
 
