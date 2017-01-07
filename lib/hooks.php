@@ -3,6 +3,7 @@
 use ArckInteractive\Mailgun\Message;
 use Elgg\Notifications\Event;
 use Elgg\Notifications\Notification;
+use Elgg\Notifications\NotificationEvent;
 
 /**
  * Send an email notification
@@ -43,28 +44,34 @@ function mailgun_send_email_notification($hook, $type, $result, $params) {
 
 	// was the token provided with $params through notify_user()
 	$token = elgg_extract('token', $params);
+
 	if (!$token) {
 		// check if token has been added to notification by "prepare", "notification:*" hook
 		$token = $notification->token;
 	}
 
 	if (!$token) {
+		$notification_params = $notification->params;
+		$token = elgg_extract('token', $notification_params);
+	}
+
+	if (!$token) {
 		// check if we have a notification event with an object
 		$event = elgg_extract('event', $params);
-		if ($event instanceof Event) {
+		if ($event instanceof NotificationEvent || $event instanceof Event) {
 			$object = $event->getObject();
 			$token = mailgun_get_entity_notification_token($object, $event->getDescription());
 		}
 	}
 
 	$params['token'] = $token;
-	
+
 	return elgg_send_email($from, $to, $notification->subject, $notification->body, $params);
 }
 
 /**
- * If a route has been configured with a store action and polling is 
- * enabled the function will fetch any new messages since the last 
+ * If a route has been configured with a store action and polling is
+ * enabled the function will fetch any new messages since the last
  * poll cycle.
  *
  * @param string $hook   the name of the hook
