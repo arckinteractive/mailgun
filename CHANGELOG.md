@@ -1,3 +1,18 @@
+<a name="2.0.4"></a>
+## [2.0.4](https://github.com/arckinteractive/mailgun/compare/2.0.3...v2.0.4) (2017-07-06)
+
+
+### Bug Fixes
+
+* **tokens:** extract tokens more reliably ([b44da5a](https://github.com/arckinteractive/mailgun/commit/b44da5a))
+
+### Features
+
+* **emogrifier:** upgrade to latest emogrifier ([7c85ea3](https://github.com/arckinteractive/mailgun/commit/7c85ea3))
+* **parser:** add a setting for a project name and set from email to use mailgun domain ([bbbf6f5](https://github.com/arckinteractive/mailgun/commit/bbbf6f5))
+
+
+
 <a name="2.0.3"></a>
 ## [2.0.3](https://github.com/arckinteractive/mailgun/compare/2.0.2...v2.0.3) (2016-08-22)
 
