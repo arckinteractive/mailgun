@@ -16,7 +16,7 @@
 	"license": "GPL-2.0",
 	"require": {
 		"composer/installers": "^1.0.8",
-		"pelago/emogrifier": "^0.1",
+		"pelago/emogrifier": "~1.0",
 		"composer-plugin-api": "^1.0",
 		"mailgun/mailgun-php": "^2.1",
 		"fire015/flintstone": "^2.0",

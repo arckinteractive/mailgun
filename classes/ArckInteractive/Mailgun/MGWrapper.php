@@ -223,6 +223,7 @@ class MGWrapper {
 	 * @return bool Has the message been received
 	 */
 	public function processMessage($message) {
+
 		// Trigger the receive event so that plugins can process the message
 		if (elgg_trigger_event('receive', 'mg_message', $message)) {
 			// Message could not be processed, let's notify the user

@@ -48,6 +48,7 @@ function mailgun_init() {
 
 	$action_base = elgg_get_plugins_path() . 'mailgun/actions';
 	elgg_register_action('mailgun/settings/save', "$action_base/settings/save.php", 'admin');
+
 }
 
 /**
@@ -83,7 +84,7 @@ function mailgun_page_handler($page) {
  * The Mailgun HTTP client can be interacted with directly
  * by fetching the client with the getClient() method.
  *
- * @return object
+ * @return MGWrapper
  */
 function mailgun_client() {
 	$apiKey = elgg_get_plugin_setting('api_key', 'mailgun');
