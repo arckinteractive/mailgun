@@ -104,6 +104,9 @@ function mailgun_send_email(array $options = null) {
 	 */
 	$options['html'] = mailgun_normalize_urls($options['html']);
 
+	// linkify text urls
+	$options['html'] = parse_urls($options['html']);
+
 	$options = mailgun_inline_images($options);
 
 	// encode subject to handle special chars
