@@ -50,7 +50,7 @@ if (get_input('send')) {
 	$params = [
 		'recipient' => $user,
 		'attachments' => [
-			dirname(__DIR__) . '/mailgun/manifest.xml',
+			elgg_get_plugins_path() . '/mailgun/manifest.xml',
 		],
 	];
 
