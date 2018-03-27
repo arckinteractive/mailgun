@@ -1,3 +1,14 @@
+<a name="2.0.5"></a>
+## [2.0.5](https://github.com/arckinteractive/mailgun/compare/2.0.4...v2.0.5) (2018-03-27)
+
+
+### Bug Fixes
+
+* **links:** turn inline urls into active links ([9359379](https://github.com/arckinteractive/mailgun/commit/9359379))
+* **test email:** correct path to manifest.xml ([36eeac9](https://github.com/arckinteractive/mailgun/commit/36eeac9))
+
+
+
 <a name="2.0.4"></a>
 ## [2.0.4](https://github.com/arckinteractive/mailgun/compare/2.0.3...v2.0.4) (2017-07-06)
 
