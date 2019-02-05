@@ -67,7 +67,18 @@ function mailgun_send_email_notification($hook, $type, $result, $params) {
 		$event = elgg_extract('event', $params);
 		if ($event instanceof NotificationEvent || $event instanceof Event) {
 			$object = $event->getObject();
-			$token = mailgun_get_entity_notification_token($object, $event->getDescription());
+
+			$token_entity = null;
+
+			if ($object instanceof ElggAnnotation) {
+				$token_entity = $object->getEntity();
+			} else if ($object instanceof ElggEntity) {
+				$token_entity = $object;
+			}
+
+			if ($token_entity instanceof ElggEntity) {
+				$token = mailgun_get_entity_notification_token($object, $event->getDescription());
+			}
 		}
 	}
 
