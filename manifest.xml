@@ -3,7 +3,7 @@
 	<name>Mailgun</name>
 	<author>Billy Gunn (billy@arckinteractive.com)</author>
 	<author>Ismayil Khayredinov (ismayil@arckinteractive.com)</author>
-	<version type="dist">2.0.7</version>
+	<version type="dist">2.0.8</version>
 	<id>mailgun</id>
  	<category>communication</category>
 	<description>Provides bi-directional email handling via Mailgun (http://www.mailgun.com/)</description>
