@@ -567,7 +567,7 @@ function mailgun_find_images($text) {
  * @param string     $handler Optional handler (context, event etc)
  * @return string|false
  */
-function mailgun_get_entity_notification_token(ElggEntity $entity = null, $handler = 'default') {
+function mailgun_get_entity_notification_token($entity = null, $handler = 'default') {
 
 	if (!$entity instanceof ElggEntity) {
 		return false;
